@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Article template</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+</head>
+<body>
+<div id="timeClock"></div>
+<br/>
+<div id="navMenu"></div>
+<br/>
+<div id="searchBox"></div>
+<script type="text/jsx">
+    var TimeCount = React.createClass({
+        getInitialState: function() {
+            return {count: 0};
+        },
+        componentDidMount: function() {
+            this.timer = setInterval(this.count, 1000);
+        },
+        componentWillUnmount: function() {
+            clearInterval(this.timer);
+        },
+        count: function() {
+            this.setState({count: this.state.count + 1});
+        },
+        render: function() {
+            return (
+              <div>num: {this.state.count}s</div>
+            );
+        }
+    });
+    React.render(<TimeCount/>,
+        document.querySelector("#timeClock"));
+
+    var NavMenu = React.createClass({
+         getInitialState: function() {
+             return {current: 0};
+         },
+         click: function(index) {
+             this.setState({current: index});
+         },
+         render: function() {
+             var liNodes = this.props.items.map(function(val, i) {
+                 var style = "";
+                 if(this.state.current == i) style = "color: red";
+                 //watch out about the {{}}, and if the onClick write like this:this.click(i)
+                 //the function running already, then react.js give a error to you.
+                 return <li style={{style}} onClick={this.click.bind(this, i)}>{val}</li>
+             }.bind(this));
+             return (
+                     <div>
+                         <ul>
+                             {liNodes}
+                         </ul>
+                         <p>Selected: {this.props.items[this.state.current]}</p>
+                     </div>
+             );
+         }
+    });
+    React.render(
+            <NavMenu items={ ['Home', 'Services', 'About', 'Contact us'] } />,
+            document.querySelector("#navMenu")
+    );
+
+    var SearchBox = React.createClass({
+        getInitialState: function() {
+            return {searchString: ""};
+        },
+        handleChange: function(e) {
+            this.setState({searchString: e.target.value});
+        },
+        getResult: function() {
+            var libs = this.props.items,
+                searchStr = this.state.searchString.trim().toLowerCase();
+            if(searchStr) {
+                return libs.filter(function(str) {
+                   return str.name.toLowerCase().match(searchStr);
+                }).map(function(el) {
+                    return <li>{el.name} <a href={el.url}>{el.url}</a></li>
+                });
+            }
+        },
+        render: function() {
+            var liNodes = this.getResult();
+            return (
+                <div>
+                    <input type="text" value={this.state.searchString} onChange={this.handleChange} placeholder="search..."/>
+                    <ul>
+                        {liNodes}
+                    </ul>
+                </div>
+            );
+        }
+    });
+    var libraries = [
+
+        { name: 'Backbone.js', url: 'http://documentcloud.github.io/backbone/'},
+        { name: 'AngularJS', url: 'https://angularjs.org/'},
+        { name: 'jQuery', url: 'http://jquery.com/'},
+        { name: 'Prototype', url: 'http://www.prototypejs.org/'},
+        { name: 'React', url: 'http://facebook.github.io/react/'},
+        { name: 'Ember', url: 'http://emberjs.com/'},
+        { name: 'Knockout.js', url: 'http://knockoutjs.com/'},
+        { name: 'Dojo', url: 'http://dojotoolkit.org/'},
+        { name: 'Mootools', url: 'http://mootools.net/'},
+        { name: 'Underscore', url: 'http://documentcloud.github.io/underscore/'},
+        { name: 'Lodash', url: 'http://lodash.com/'},
+        { name: 'Moment', url: 'http://momentjs.com/'},
+        { name: 'Express', url: 'http://expressjs.com/'},
+        { name: 'Koa', url: 'http://koajs.com/'},
+
+    ];
+    React.render(
+            <SearchBox items={libraries}/>,
+            document.querySelector("#searchBox")
+    );
+</script>
+</body>
+</html>
